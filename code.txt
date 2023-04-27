@@ -1,0 +1,51 @@
+using System;
+using System.ComponentModel;
+using System.IO;
+using BepInEx;
+using BepInEx.Configuration;
+using SpaceMonke.HarmonyPatches;
+using Utilla;
+
+namespace SpaceMonke
+{
+	// Token: 0x02000002 RID: 2
+	[Description("HauntedModMenu")]
+	[BepInPlugin("org.legoandmars.gorillatag.spacemonke", "SuperSpaceMonke", "1.2.3")]
+	[BepInDependency("org.legoandmars.gorillatag.utilla", "1.5.0")]
+	[ModdedGamemode]
+	public class SpaceMonke : BaseUnityPlugin
+	{
+		// Token: 0x06000001 RID: 1
+		private void OnEnable()
+		{
+			SpaceMonkePatches.ApplyHarmonyPatches();
+			SpaceMonke.multiplier = new ConfigFile(Path.Combine(Paths.ConfigPath, "SpaceMonke.cfg"), true).Bind<float>("Configuration", "JumpMultiplier", 100f, "How much to multiply the jump height/distance by. 100 = 100x higher jumps");
+		}
+
+		// Token: 0x06000002 RID: 2
+		private void OnDisable()
+		{
+			SpaceMonkePatches.RemoveHarmonyPatches();
+		}
+
+		// Token: 0x06000003 RID: 3
+		[ModdedGamemodeJoin]
+		private void RoomJoined()
+		{
+			SpaceMonke.allowSpaceMonke = true;
+		}
+
+		// Token: 0x06000004 RID: 4
+		[ModdedGamemodeLeave]
+		private void RoomLeft()
+		{
+			SpaceMonke.allowSpaceMonke = false;
+		}
+
+		// Token: 0x04000001 RID: 1
+		public static bool allowSpaceMonke;
+
+		// Token: 0x04000002 RID: 2
+		public static ConfigEntry<float> multiplier;
+	}
+}
